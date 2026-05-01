@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>АДМИН // РУСЛАН СИЛИН</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0a0a0a;color:#fff;font-family:'Oswald',sans-serif;padding:30px;text-transform:uppercase;letter-spacing:1px}
+    .container{max-width:1300px;margin:0 auto}
+    h1{font-size:2.5rem;font-weight:700;margin-bottom:30px;letter-spacing:8px;border-bottom:2px solid #c00;padding-bottom:20px}
+    h2{font-size:1.1rem;margin-bottom:15px;color:#c00;letter-spacing:4px;font-weight:400}
+    .tabs{display:flex;gap:5px;margin-bottom:30px;flex-wrap:wrap}
+    .tab{padding:12px 20px;background:#111;border:1px solid #1a1a1a;cursor:pointer;transition:0.2s;font-family:'Oswald',sans-serif;letter-spacing:3px;font-size:12px;color:#fff}
+    .tab.active,.tab:hover{background:#c00;border-color:#c00}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-bottom:30px}
+    form{background:#111;border:1px solid #1a1a1a;padding:25px}
+    input,textarea,button,select{width:100%;padding:14px;margin:8px 0;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;font-family:'Roboto Mono',monospace;font-size:13px;letter-spacing:1px}
+    textarea{min-height:80px;resize:vertical;text-transform:none}
+    input:focus,textarea:focus,select:focus{outline:none;border-color:#c00}
+    input[type="file"]{padding:10px;cursor:pointer}
+    input[type="file"]::file-selector-button{background:#c00;border:0;padding:8px 16px;color:#fff;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-right:12px}
+    input[type="color"]{padding:4px;height:50px;cursor:pointer;width:100px}
+    button{background:#c00;border:0;font-weight:600;cursor:pointer;transition:0.2s;margin-top:15px;font-size:14px;letter-spacing:3px}
+    button:hover{background:#a00}
+    label{display:block;margin-top:12px;color:#888;font-size:11px;letter-spacing:2px}
+    .preview{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .preview img{width:70px;height:70px;object-fit:cover;border:1px solid #2a2a2a}
+    table{width:100%;border-collapse:collapse;margin-bottom:30px}
+    th,td{padding:12px 15px;text-align:left;border-bottom:1px solid #1a1a1a;font-size:12px}
+    th{background:#111;color:#c00;letter-spacing:3px;font-weight:400}
+    td{font-family:'Roboto Mono',monospace;text-transform:none}
+    tr:hover td{background:#111}
+    .btn-sm{display:inline-block;padding:8px 16px;background:transparent;border:1px solid #c00;color:#fff;text-decoration:none;font-size:10px;letter-spacing:2px;cursor:pointer;transition:0.2s;margin:2px;width:auto}
+    .btn-sm:hover{background:#c00}
+    .btn-sm.danger{border-color:#a00;color:#a00}
+    .btn-sm.danger:hover{background:#a00;color:#fff}
+    .back-link{display:block;text-align:center;margin-top:40px;color:#555;text-decoration:none;letter-spacing:4px;font-size:12px}
+    .back-link:hover{color:#c00}
+    .hint{font-size:10px;color:#666;margin-top:5px;text-transform:none;letter-spacing:0}
+    .info-box{background:#111;border:1px solid #1a1a1a;padding:25px}
+    .info-box p{font-family:'Roboto Mono',monospace;font-size:12px;text-transform:none;color:#aaa;line-height:1.8}
+    .stat{font-size:2rem;color:#c00;font-weight:700}
+    .empty{text-align:center;padding:30px;color:#444;font-family:'Roboto Mono',monospace}
+    .color-row{display:flex;gap:20px;align-items:center}
+    .color-row label{margin-top:0}
+    .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+    .gallery-thumb{aspect-ratio:1/1;border:1px solid #1a1a1a;position:relative;overflow:hidden}
+    .gallery-thumb img{width:100%;height:100%;object-fit:cover}
+    .gallery-thumb .overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.8);padding:10px;font-size:10px;text-align:center}
+    .gallery-thumb .overlay button{width:100%;margin:3px 0;padding:6px;font-size:9px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>АДМИН-ПАНЕЛЬ</h1>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('add')">ДОБАВИТЬ</div>
+      <div class="tab" onclick="switchTab('tracks')">ТРЕКИ</div>
+      <div class="tab" onclick="switchTab('videos')">ВИДЕО</div>
+      <div class="tab" onclick="switchTab('concerts')">КОНЦЕРТЫ</div>
+      <div class="tab" onclick="switchTab('gallery')">ГАЛЕРЕЯ</div>
+      <div class="tab" onclick="switchTab('about')">ОБ АРТИСТЕ</div>
+      <div class="tab" onclick="switchTab('design')">ДИЗАЙН</div>
+      <div class="tab" onclick="switchTab('stats')">СТАТИСТИКА</div>
+    </div>
+
+    <!-- ДОБАВИТЬ -->
+    <div class="tab-content active" id="tab-add">
+      <div class="admin-grid">
+        <div>
+          <form action="/api/admin/track" method="POST" enctype="multipart/form-data">
+            <h2>ДОБАВИТЬ ССЫЛКУ НА МУЗЫКУ</h2>
+            <input name="title" placeholder="НАЗВАНИЕ" required>
+            <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
+            <input name="url" placeholder="ССЫЛКА (ЯНДЕКС МУЗЫКА / VK)" required>
+            <label>ОБЛОЖКА</label>
+            <input type="file" name="cover" accept="image/*" onchange="previewImage(this, 'cover-preview')">
+            <div class="preview" id="cover-preview"></div>
+            <button type="submit">ДОБАВИТЬ</button>
+          </form>
+        </div>
+        <div>
+          <form action="/api/admin/video" method="POST">
+            <h2>ДОБАВИТЬ ВИДЕО</h2>
+            <input name="title" placeholder="НАЗВАНИЕ" required>
+            <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
+            <input name="youtube_url" placeholder="ССЫЛКА НА YOUTUBE" required>
+            <button type="submit">ДОБАВИТЬ</button>
+          </form>
+          <form action="/api/admin/concert" method="POST" style="margin-top:20px">
+            <h2>ДОБАВИТЬ КОНЦЕРТ</h2>
+            <input name="city" placeholder="ГОРОД" required>
+            <input name="venue" placeholder="ПЛОЩАДКА">
+            <input name="date" placeholder="ДАТА (15.05.2026)" required>
+            <input name="time" placeholder="ВРЕМЯ">
+            <input name="ticket_url" placeholder="ССЫЛКА НА БИЛЕТЫ">
+            <textarea name="description" placeholder="ДОП. ИНФОРМАЦИЯ"></textarea>
+            <button type="submit">ДОБАВИТЬ</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ТРЕКИ -->
+    <div class="tab-content" id="tab-tracks"><h2>ВСЕ ТРЕКИ</h2><div id="tracks-table"></div></div>
+    <!-- ВИДЕО -->
+    <div class="tab-content" id="tab-videos"><h2>ВСЕ ВИДЕО</h2><div id="videos-table"></div></div>
+    <!-- КОНЦЕРТЫ -->
+    <div class="tab-content" id="tab-concerts"><h2>ВСЕ КОНЦЕРТЫ</h2><div id="concerts-table"></div></div>
+
+    <!-- ГАЛЕРЕЯ -->
+    <div class="tab-content" id="tab-gallery">
+      <h2>УПРАВЛЕНИЕ ГАЛЕРЕЕЙ</h2>
+      <form action="/api/admin/gallery" method="POST" enctype="multipart/form-data">
+        <input name="title" placeholder="ЗАГОЛОВОК">
+        <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
+        <label>ИЗОБРАЖЕНИЕ</label>
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">ДОБАВИТЬ В ГАЛЕРЕЮ</button>
+      </form>
+      <h2 style="margin-top:30px">ТЕКУЩИЕ ИЗОБРАЖЕНИЯ</h2>
+      <div class="gallery-grid" id="gallery-admin"></div>
+    </div>
+
+    <!-- ОБ АРТИСТЕ -->
+    <div class="tab-content" id="tab-about">
+      <h2>РЕДАКТИРОВАТЬ ТЕКСТ «ОБ АРТИСТЕ»</h2>
+      <form id="about-form">
+        <textarea id="about-text" rows="12" style="text-transform:none"></textarea>
+        <button type="submit">СОХРАНИТЬ</button>
+      </form>
+      <div class="info-box" style="margin-top:20px">
+        <h2>СТАТИСТИКА (ЦИФРЫ)</h2>
+        <form id="stats-form">
+          <div class="admin-grid">
+            <div><label>ЦИФРА 1</label><input id="stat1-num" placeholder="150+"></div>
+            <div><label>ПОДПИСЬ 1</label><input id="stat1-label" placeholder="ПЕСЕН"></div>
+            <div><label>ЦИФРА 2</label><input id="stat2-num" placeholder="15"></div>
+            <div><label>ПОДПИСЬ 2</label><input id="stat2-label" placeholder="ЛЕТ НА СЦЕНЕ"></div>
+            <div><label>ЦИФРА 3</label><input id="stat3-num" placeholder="3"></div>
+            <div><label>ПОДПИСЬ 3</label><input id="stat3-label" placeholder="СЕЗОН ГОЛОС"></div>
+          </div>
+          <button type="submit">СОХРАНИТЬ ЦИФРЫ</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ДИЗАЙН -->
+    <div class="tab-content" id="tab-design">
+      <h2>ЦВЕТОВАЯ СХЕМА</h2>
+      <form id="design-form">
+        <div class="admin-grid">
+          <div class="info-box">
+            <label>ОСНОВНОЙ ЦВЕТ (АКЦЕНТ)</label>
+            <input type="color" id="accent-color" value="#cc0000">
+          </div>
+          <div class="info-box">
+            <label>ЦВЕТ ФОНА</label>
+            <input type="color" id="bg-color" value="#000000">
+          </div>
+          <div class="info-box">
+            <label>ЦВЕТ ТЕКСТА</label>
+            <input type="color" id="text-color" value="#ffffff">
+          </div>
+          <div class="info-box">
+            <label>ШРИФТ ЗАГОЛОВКОВ</label>
+            <select id="heading-font">
+              <option value="Oswald">Oswald</option>
+              <option value="Impact">Impact</option>
+              <option value="Arial Black">Arial Black</option>
+            </select>
+            <label>ШРИФТ ТЕКСТА</label>
+            <select id="body-font">
+              <option value="Roboto Mono">Roboto Mono</option>
+              <option value="Courier New">Courier New</option>
+              <option value="Arial">Arial</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit">ПРИМЕНИТЬ ДИЗАЙН</button>
+      </form>
+    </div>
+
+    <!-- СТАТИСТИКА -->
+    <div class="tab-content" id="tab-stats">
+      <div class="admin-grid">
+        <div class="info-box"><h2>ТРЕКИ</h2><div class="stat" id="stat-tracks">-</div></div>
+        <div class="info-box"><h2>ВИДЕО</h2><div class="stat" id="stat-videos">-</div></div>
+        <div class="info-box"><h2>КОНЦЕРТЫ</h2><div class="stat" id="stat-concerts">-</div></div>
+        <div class="info-box"><h2>ПОДПИСЧИКИ</h2><div class="stat" id="stat-subscribers">-</div></div>
+      </div>
+    </div>
+
+    <a href="/" class="back-link">[ ВЕРНУТЬСЯ НА САЙТ ]</a>
+  </div>
+
+  <script>
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('.tab[onclick*="'+name+'"]').classList.add('active');
+      document.getElementById('tab-'+name).classList.add('active');
+      if(name==='tracks') loadTracks();
+      if(name==='videos') loadVideos();
+      if(name==='concerts') loadConcerts();
+      if(name==='gallery') loadGallery();
+      if(name==='about') loadAbout();
+      if(name==='design') loadDesign();
+      if(name==='stats') loadStats();
+    }
+
+    function previewImage(input, previewId) {
+      const preview = document.getElementById(previewId);
+      preview.innerHTML = '';
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => { const img = document.createElement('img'); img.src = e.target.result; preview.appendChild(img); };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    async function loadTracks() {
+      const res = await fetch('/api/tracks');
+      const data = await res.json();
+      const c = document.getElementById('tracks-table');
+      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ ТРЕКОВ</div>'; return; }
+      c.innerHTML = '<table><tr><th>ОБЛОЖКА</th><th>НАЗВАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr>'
+        + data.map(t => '<tr><td>'+(t.cover?'<img src="/uploads/'+t.cover+'" style="width:50px;height:50px;object-fit:cover">':'—')+'</td><td>'+t.title+'</td><td><a href="'+t.file+'" target="_blank" style="color:#c00;text-decoration:none">ОТКРЫТЬ</a></td><td><button class="btn-sm danger" onclick="deleteItem(\'track\','+t.id+')">УДАЛИТЬ</button></td></tr>').join('')+'</table>';
+    }
+
+    async function loadVideos() {
+      const res = await fetch('/api/videos');
+      const data = await res.json();
+      const c = document.getElementById('videos-table');
+      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ ВИДЕО</div>'; return; }
+      c.innerHTML = '<table><tr><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr>'
+        + data.map(v => '<tr><td>'+v.title+'</td><td>'+(v.description||'—')+'</td><td><a href="'+v.youtube_url+'" target="_blank" style="color:#c00;text-decoration:none">ОТКРЫТЬ</a></td><td><button class="btn-sm danger" onclick="deleteItem(\'video\','+v.id+')">УДАЛИТЬ</button></td></tr>').join('')+'</table>';
+    }
+
+    async function loadConcerts() {
+      const res = await fetch('/api/concerts');
+      const data = await res.json();
+      const c = document.getElementById('concerts-table');
+      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ КОНЦЕРТОВ</div>'; return; }
+      c.innerHTML = '<table><tr><th>ДАТА</th><th>ГОРОД</th><th>ПЛОЩАДКА</th><th>БИЛЕТЫ</th><th>ДЕЙСТВИЯ</th></tr>'
+        + data.map(co => '<tr><td>'+co.date+' '+(co.time||'')+'</td><td>'+co.city+'</td><td>'+(co.venue||'—')+'</td><td>'+(co.ticket_url?'<a href="'+co.ticket_url+'" target="_blank" style="color:#c00;text-decoration:none">ОТКРЫТЬ</a>':'—')+'</td><td><button class="btn-sm danger" onclick="deleteItem(\'concert\','+co.id+')">УДАЛИТЬ</button></td></tr>').join('')+'</table>';
+    }
+
+    async function loadGallery() {
+      const res = await fetch('/api/gallery');
+      const data = await res.json();
+      const c = document.getElementById('gallery-admin');
+      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ ИЗОБРАЖЕНИЙ</div>'; return; }
+      c.innerHTML = data.map(g => '<div class="gallery-thumb"><img src="/uploads/'+g.file+'"><div class="overlay"><strong>'+g.title+'</strong><br>'+g.description+'<br><button class="btn-sm danger" onclick="deleteItem(\'gallery\','+g.id+')" style="margin-top:5px">УДАЛИТЬ</button></div></div>').join('');
+    }
+
+    async function loadAbout() {
+      const res = await fetch('/api/about');
+      const data = await res.json();
+      document.getElementById('about-text').value = data.text || '';
+      document.getElementById('stat1-num').value = data.stat1 || '150+';
+      document.getElementById('stat1-label').value = data.stat1label || 'ПЕСЕН';
+      document.getElementById('stat2-num').value = data.stat2 || '15';
+      document.getElementById('stat2-label').value = data.stat2label || 'ЛЕТ НА СЦЕНЕ';
+      document.getElementById('stat3-num').value = data.stat3 || '3';
+      document.getElementById('stat3-label').value = data.stat3label || 'СЕЗОН ГОЛОС';
+    }
+
+    async function loadDesign() {
+      const res = await fetch('/api/design');
+      const data = await res.json();
+      if (data.accent) document.getElementById('accent-color').value = data.accent;
+      if (data.bg) document.getElementById('bg-color').value = data.bg;
+      if (data.text) document.getElementById('text-color').value = data.text;
+      if (data.headingFont) document.getElementById('heading-font').value = data.headingFont;
+      if (data.bodyFont) document.getElementById('body-font').value = data.bodyFont;
+    }
+
+    async function loadStats() {
+      const [tracks, videos, concerts] = await Promise.all([
+        fetch('/api/tracks').then(r => r.json()),
+        fetch('/api/videos').then(r => r.json()),
+        fetch('/api/concerts').then(r => r.json())
+      ]);
+      document.getElementById('stat-tracks').textContent = tracks.length;
+      document.getElementById('stat-videos').textContent = videos.length;
+      document.getElementById('stat-concerts').textContent = concerts.length;
+    }
+
+    async function deleteItem(type, id) {
+      if (!confirm('Удалить '+type+' #'+id+'?')) return;
+      try {
+        await fetch('/api/admin/'+type+'/'+id, { method: 'DELETE' });
+        if (type === 'track') loadTracks();
+        if (type === 'video') loadVideos();
+        if (type === 'concert') loadConcerts();
+        if (type === 'gallery') loadGallery();
+      } catch (e) { alert('ОШИБКА'); }
+    }
+
+    // Сохранение «Об артисте»
+    document.getElementById('about-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const text = document.getElementById('about-text').value;
+      await fetch('/api/admin/about', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text}) });
+      alert('СОХРАНЕНО. Обнови сайт.');
+    });
+
+    // Сохранение статистики
+    document.getElementById('stats-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = {
+        stat1: document.getElementById('stat1-num').value,
+        stat1label: document.getElementById('stat1-label').value,
+        stat2: document.getElementById('stat2-num').value,
+        stat2label: document.getElementById('stat2-label').value,
+        stat3: document.getElementById('stat3-num').value,
+        stat3label: document.getElementById('stat3-label').value
+      };
+      await fetch('/api/admin/about/stats', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+      alert('СОХРАНЕНО. Обнови сайт.');
+    });
+
+    // Сохранение дизайна
+    document.getElementById('design-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = {
+        accent: document.getElementById('accent-color').value,
+        bg: document.getElementById('bg-color').value,
+        text: document.getElementById('text-color').value,
+        headingFont: document.getElementById('heading-font').value,
+        bodyFont: document.getElementById('body-font').value
+      };
+      await fetch('/api/admin/design', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+      alert('ДИЗАЙН ОБНОВЛЁН. Обнови сайт.');
+    });
+  </script>
+</body>
+</html>

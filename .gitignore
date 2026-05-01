@@ -1,0 +1,4 @@
+node_modules/
+music.db
+public/uploads/*
+.DS_Store
