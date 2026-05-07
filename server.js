@@ -24,6 +24,7 @@ initSqlJs().then(SQL => {
   db.run('CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, created DATETIME DEFAULT CURRENT_TIMESTAMP)');
   db.run('CREATE TABLE IF NOT EXISTS gallery (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, file TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP)');
   db.run('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)');
+  db.run('CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP)');
   
   saveDatabase();
   app.listen(port, () => console.log('http://localhost:'+port));
@@ -170,7 +171,25 @@ app.post('/api/subscribe', (req, res) => {
   res.json({ok:true});
 });
 
+
+// ORDER SONG
+app.post('/api/order', (req, res) => {
+  const {name, email, phone} = req.body;
+  db.run('INSERT INTO orders (name, email, phone) VALUES (?, ?, ?)', [name, email, phone]);
+  saveDatabase();
+  res.json({ok:true});
+});
+
+app.get('/api/admin/orders', adminAuth, (req, res) => {
+  try {
+    const result = db.exec('SELECT * FROM orders ORDER BY created DESC');
+    const orders = result.length ? result[0].values.map(r => ({id:r[0],name:r[1],email:r[2],phone:r[3],created:r[4]})) : [];
+    res.json(orders);
+  } catch(e) { res.json([]); }
+});
+
 // DELETE APIs
+
 app.delete('/api/admin/track/:id', adminAuth, (req, res) => {
   try { db.run('DELETE FROM tracks WHERE id = ?', [req.params.id]); saveDatabase(); res.json({ok:true}); } catch(e) { res.status(500).json({error:e.message}); }
 });
