@@ -8,12 +8,15 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{background:#0a0a0a;color:#fff;font-family:'Oswald',sans-serif;padding:30px;text-transform:uppercase;letter-spacing:1px}
-    .container{max-width:1300px;margin:0 auto}
-    h1{font-size:2.5rem;font-weight:700;margin-bottom:30px;letter-spacing:8px;border-bottom:2px solid #c00;padding-bottom:20px}
-    h2{font-size:1.1rem;margin-bottom:15px;color:#c00;letter-spacing:4px;font-weight:400}
-    .tabs{display:flex;gap:5px;margin-bottom:30px;flex-wrap:wrap}
-    .tab{padding:12px 20px;background:#111;border:1px solid #1a1a1a;cursor:pointer;transition:0.2s;font-family:'Oswald',sans-serif;letter-spacing:3px;font-size:12px;color:#fff}
+    .container{max-width:1400px;margin:0 auto}
+    h1{font-size:2.5rem;font-weight:700;margin-bottom:10px;letter-spacing:8px;border-bottom:2px solid #c00;padding-bottom:20px}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .notifications{position:relative}
+    .badge{position:absolute;top:-8px;right:-8px;background:#c00;color:#fff;border-radius:50%;width:22px;height:22px;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:'Roboto Mono',monospace}
+    .tabs{display:flex;gap:4px;margin-bottom:30px;flex-wrap:wrap}
+    .tab{padding:12px 18px;background:#111;border:1px solid #1a1a1a;cursor:pointer;transition:0.2s;font-family:'Oswald',sans-serif;letter-spacing:3px;font-size:11px;color:#fff;position:relative}
     .tab.active,.tab:hover{background:#c00;border-color:#c00}
+    .tab .badge-tab{position:absolute;top:4px;right:4px;background:#fff;color:#c00;border-radius:50%;width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-family:'Roboto Mono',monospace}
     .tab-content{display:none}
     .tab-content.active{display:block}
     .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-bottom:30px}
@@ -26,43 +29,66 @@
     input[type="color"]{padding:4px;height:50px;cursor:pointer;width:100px}
     button{background:#c00;border:0;font-weight:600;cursor:pointer;transition:0.2s;margin-top:15px;font-size:14px;letter-spacing:3px}
     button:hover{background:#a00}
+    button:disabled{background:#333;cursor:not-allowed}
     label{display:block;margin-top:12px;color:#888;font-size:11px;letter-spacing:2px}
     .preview{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
     .preview img{width:70px;height:70px;object-fit:cover;border:1px solid #2a2a2a}
-    table{width:100%;border-collapse:collapse;margin-bottom:30px}
+    table{width:100%;border-collapse:collapse;margin-bottom:20px}
     th,td{padding:12px 15px;text-align:left;border-bottom:1px solid #1a1a1a;font-size:12px}
-    th{background:#111;color:#c00;letter-spacing:3px;font-weight:400}
-    td{font-family:'Roboto Mono',monospace;text-transform:none}
+    th{background:#111;color:#c00;letter-spacing:3px;font-weight:400;position:sticky;top:0}
+    td{font-family:'Roboto Mono',monospace;text-transform:none;word-break:break-word}
     tr:hover td{background:#111}
-    .btn-sm{display:inline-block;padding:8px 16px;background:transparent;border:1px solid #c00;color:#fff;text-decoration:none;font-size:10px;letter-spacing:2px;cursor:pointer;transition:0.2s;margin:2px;width:auto}
+    tr.fade-out{opacity:0;transition:0.3s}
+    .search-box{margin-bottom:20px}
+    .search-box input{width:100%;padding:14px;background:#111;border:1px solid #1a1a1a;color:#fff;font-family:'Roboto Mono',monospace;font-size:13px}
+    .btn-sm{display:inline-block;padding:8px 16px;background:transparent;border:1px solid #c00;color:#fff;text-decoration:none;font-size:10px;letter-spacing:2px;cursor:pointer;transition:0.2s;margin:2px;width:auto;font-family:'Oswald',sans-serif}
     .btn-sm:hover{background:#c00}
     .btn-sm.danger{border-color:#a00;color:#a00}
     .btn-sm.danger:hover{background:#a00;color:#fff}
+    .btn-sm.success{border-color:#0a0;color:#0a0}
+    .btn-sm.success:hover{background:#0a0;color:#fff}
     .back-link{display:block;text-align:center;margin-top:40px;color:#555;text-decoration:none;letter-spacing:4px;font-size:12px}
     .back-link:hover{color:#c00}
     .hint{font-size:10px;color:#666;margin-top:5px;text-transform:none;letter-spacing:0}
     .info-box{background:#111;border:1px solid #1a1a1a;padding:25px}
     .info-box p{font-family:'Roboto Mono',monospace;font-size:12px;text-transform:none;color:#aaa;line-height:1.8}
     .stat{font-size:2rem;color:#c00;font-weight:700}
-    .empty{text-align:center;padding:30px;color:#444;font-family:'Roboto Mono',monospace}
+    .empty{text-align:center;padding:40px;color:#444;font-family:'Roboto Mono',monospace;font-size:14px}
     .color-row{display:flex;gap:20px;align-items:center}
-    .color-row label{margin-top:0}
-    .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
-    .gallery-thumb{aspect-ratio:1/1;border:1px solid #1a1a1a;position:relative;overflow:hidden}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:15px}
+    .gallery-thumb{aspect-ratio:1/1;border:1px solid #1a1a1a;position:relative;overflow:hidden;background:#000}
     .gallery-thumb img{width:100%;height:100%;object-fit:cover}
-    .gallery-thumb .overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.8);padding:10px;font-size:10px;text-align:center}
-    .gallery-thumb .overlay button{width:100%;margin:3px 0;padding:6px;font-size:9px}
+    .gallery-thumb .overlay{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.85);padding:10px;font-size:10px;text-align:center;transform:translateY(100%);transition:0.3s}
+    .gallery-thumb:hover .overlay{transform:translateY(0)}
+    .toast{position:fixed;bottom:30px;right:30px;background:#c00;color:#fff;padding:16px 24px;font-family:'Oswald',sans-serif;letter-spacing:2px;z-index:20000;transform:translateX(120%);transition:0.3s;font-size:14px}
+    .toast.show{transform:translateX(0)}
+    .toast.success{background:#0a0}
+    .toast.error{background:#a00}
+    .modal-confirm{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:15000;display:none;align-items:center;justify-content:center}
+    .modal-confirm.active{display:flex}
+    .modal-confirm-box{background:#111;border:1px solid #c00;padding:30px;text-align:center;max-width:400px;width:90%}
+    .modal-confirm-box p{font-family:'Roboto Mono',monospace;font-size:14px;text-transform:none;margin-bottom:20px}
+    .modal-confirm-btns{display:flex;gap:15px;justify-content:center}
+    .export-btn{margin-top:15px}
+    @media(max-width:768px){.admin-grid{grid-template-columns:1fr}th,td{font-size:10px;padding:8px 10px}}
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>АДМИН-ПАНЕЛЬ</h1>
+    <div class="header">
+      <h1>АДМИН-ПАНЕЛЬ</h1>
+      <div class="notifications" id="orders-badge" style="display:none">
+        <span style="font-size:12px;opacity:0.7">ЗАЯВКИ</span>
+        <span class="badge" id="orders-count">0</span>
+      </div>
+    </div>
 
     <div class="tabs">
       <div class="tab active" onclick="switchTab('add')">ДОБАВИТЬ</div>
       <div class="tab" onclick="switchTab('tracks')">ТРЕКИ</div>
       <div class="tab" onclick="switchTab('videos')">ВИДЕО</div>
-      <div class="tab" onclick="switchTab('concerts')">КОНЦЕРТЫ</div>
+      <div class="tab" onclick="switchTab('concerts')">МЕРОПРИЯТИЯ</div>
+      <div class="tab" onclick="switchTab('orders')">ЗАЯВКИ <span class="badge-tab" id="orders-tab-badge" style="display:none">0</span></div>
       <div class="tab" onclick="switchTab('gallery')">ГАЛЕРЕЯ</div>
       <div class="tab" onclick="switchTab('about')">ОБ АРТИСТЕ</div>
       <div class="tab" onclick="switchTab('design')">ДИЗАЙН</div>
@@ -73,7 +99,7 @@
     <div class="tab-content active" id="tab-add">
       <div class="admin-grid">
         <div>
-          <form action="/api/admin/track" method="POST" enctype="multipart/form-data">
+          <form action="/api/admin/track" method="POST" enctype="multipart/form-data" onsubmit="return handleFormSubmit(event, this, 'Трек добавлен!')">
             <h2>ДОБАВИТЬ ССЫЛКУ НА МУЗЫКУ</h2>
             <input name="title" placeholder="НАЗВАНИЕ" required>
             <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
@@ -85,15 +111,15 @@
           </form>
         </div>
         <div>
-          <form action="/api/admin/video" method="POST">
+          <form action="/api/admin/video" method="POST" onsubmit="return handleFormSubmit(event, this, 'Видео добавлено!')">
             <h2>ДОБАВИТЬ ВИДЕО</h2>
             <input name="title" placeholder="НАЗВАНИЕ" required>
             <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
             <input name="youtube_url" placeholder="ССЫЛКА НА YOUTUBE" required>
             <button type="submit">ДОБАВИТЬ</button>
           </form>
-          <form action="/api/admin/concert" method="POST" style="margin-top:20px">
-            <h2>ДОБАВИТЬ КОНЦЕРТ</h2>
+          <form action="/api/admin/concert" method="POST" style="margin-top:20px" onsubmit="return handleFormSubmit(event, this, 'Мероприятие добавлено!')">
+            <h2>ДОБАВИТЬ МЕРОПРИЯТИЕ</h2>
             <input name="city" placeholder="ГОРОД" required>
             <input name="venue" placeholder="ПЛОЩАДКА">
             <input name="date" placeholder="ДАТА (15.05.2026)" required>
@@ -107,16 +133,41 @@
     </div>
 
     <!-- ТРЕКИ -->
-    <div class="tab-content" id="tab-tracks"><h2>ВСЕ ТРЕКИ</h2><div id="tracks-table"></div></div>
+    <div class="tab-content" id="tab-tracks">
+      <h2>ВСЕ ТРЕКИ</h2>
+      <div class="search-box"><input type="text" placeholder="ПОИСК..." oninput="filterTable('tracks-table', this.value)"></div>
+      <button class="btn-sm success export-btn" onclick="exportTable('tracks-table', 'треки')">ЭКСПОРТ CSV</button>
+      <div id="tracks-table"></div>
+    </div>
+
     <!-- ВИДЕО -->
-    <div class="tab-content" id="tab-videos"><h2>ВСЕ ВИДЕО</h2><div id="videos-table"></div></div>
-    <!-- КОНЦЕРТЫ -->
-    <div class="tab-content" id="tab-concerts"><h2>ВСЕ КОНЦЕРТЫ</h2><div id="concerts-table"></div></div>
+    <div class="tab-content" id="tab-videos">
+      <h2>ВСЕ ВИДЕО</h2>
+      <div class="search-box"><input type="text" placeholder="ПОИСК..." oninput="filterTable('videos-table', this.value)"></div>
+      <button class="btn-sm success export-btn" onclick="exportTable('videos-table', 'видео')">ЭКСПОРТ CSV</button>
+      <div id="videos-table"></div>
+    </div>
+
+    <!-- МЕРОПРИЯТИЯ -->
+    <div class="tab-content" id="tab-concerts">
+      <h2>ВСЕ МЕРОПРИЯТИЯ</h2>
+      <div class="search-box"><input type="text" placeholder="ПОИСК..." oninput="filterTable('concerts-table', this.value)"></div>
+      <button class="btn-sm success export-btn" onclick="exportTable('concerts-table', 'мероприятия')">ЭКСПОРТ CSV</button>
+      <div id="concerts-table"></div>
+    </div>
+
+    <!-- ЗАЯВКИ -->
+    <div class="tab-content" id="tab-orders">
+      <h2>ЗАЯВКИ НА ПЕСНЮ</h2>
+      <div class="search-box"><input type="text" placeholder="ПОИСК..." oninput="filterTable('orders-table', this.value)"></div>
+      <button class="btn-sm success export-btn" onclick="exportTable('orders-table', 'заявки')">ЭКСПОРТ CSV</button>
+      <div id="orders-table"></div>
+    </div>
 
     <!-- ГАЛЕРЕЯ -->
     <div class="tab-content" id="tab-gallery">
       <h2>УПРАВЛЕНИЕ ГАЛЕРЕЕЙ</h2>
-      <form action="/api/admin/gallery" method="POST" enctype="multipart/form-data">
+      <form action="/api/admin/gallery" method="POST" enctype="multipart/form-data" onsubmit="return handleFormSubmit(event, this, 'Фото добавлено!')">
         <input name="title" placeholder="ЗАГОЛОВОК">
         <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
         <label>ИЗОБРАЖЕНИЕ</label>
@@ -132,7 +183,7 @@
       <h2>РЕДАКТИРОВАТЬ ТЕКСТ «ОБ АРТИСТЕ»</h2>
       <form id="about-form">
         <textarea id="about-text" rows="12" style="text-transform:none"></textarea>
-        <button type="submit">СОХРАНИТЬ</button>
+        <button type="submit">СОХРАНИТЬ ТЕКСТ</button>
       </form>
       <div class="info-box" style="margin-top:20px">
         <h2>СТАТИСТИКА (ЦИФРЫ)</h2>
@@ -155,31 +206,14 @@
       <h2>ЦВЕТОВАЯ СХЕМА</h2>
       <form id="design-form">
         <div class="admin-grid">
-          <div class="info-box">
-            <label>ОСНОВНОЙ ЦВЕТ (АКЦЕНТ)</label>
-            <input type="color" id="accent-color" value="#cc0000">
-          </div>
-          <div class="info-box">
-            <label>ЦВЕТ ФОНА</label>
-            <input type="color" id="bg-color" value="#000000">
-          </div>
-          <div class="info-box">
-            <label>ЦВЕТ ТЕКСТА</label>
-            <input type="color" id="text-color" value="#ffffff">
-          </div>
+          <div class="info-box"><label>ОСНОВНОЙ ЦВЕТ</label><input type="color" id="accent-color" value="#cc0000"></div>
+          <div class="info-box"><label>ЦВЕТ ФОНА</label><input type="color" id="bg-color" value="#000000"></div>
+          <div class="info-box"><label>ЦВЕТ ТЕКСТА</label><input type="color" id="text-color" value="#ffffff"></div>
           <div class="info-box">
             <label>ШРИФТ ЗАГОЛОВКОВ</label>
-            <select id="heading-font">
-              <option value="Oswald">Oswald</option>
-              <option value="Impact">Impact</option>
-              <option value="Arial Black">Arial Black</option>
-            </select>
+            <select id="heading-font"><option value="Oswald">Oswald</option><option value="Impact">Impact</option><option value="Arial Black">Arial Black</option></select>
             <label>ШРИФТ ТЕКСТА</label>
-            <select id="body-font">
-              <option value="Roboto Mono">Roboto Mono</option>
-              <option value="Courier New">Courier New</option>
-              <option value="Arial">Arial</option>
-            </select>
+            <select id="body-font"><option value="Roboto Mono">Roboto Mono</option><option value="Courier New">Courier New</option><option value="Arial">Arial</option></select>
           </div>
         </div>
         <button type="submit">ПРИМЕНИТЬ ДИЗАЙН</button>
@@ -191,23 +225,72 @@
       <div class="admin-grid">
         <div class="info-box"><h2>ТРЕКИ</h2><div class="stat" id="stat-tracks">-</div></div>
         <div class="info-box"><h2>ВИДЕО</h2><div class="stat" id="stat-videos">-</div></div>
-        <div class="info-box"><h2>КОНЦЕРТЫ</h2><div class="stat" id="stat-concerts">-</div></div>
-        <div class="info-box"><h2>ПОДПИСЧИКИ</h2><div class="stat" id="stat-subscribers">-</div></div>
+        <div class="info-box"><h2>МЕРОПРИЯТИЯ</h2><div class="stat" id="stat-concerts">-</div></div>
+        <div class="info-box"><h2>ЗАЯВКИ</h2><div class="stat" id="stat-orders">-</div></div>
       </div>
     </div>
 
     <a href="/" class="back-link">[ ВЕРНУТЬСЯ НА САЙТ ]</a>
   </div>
 
+  <!-- ТОСТ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ -->
+  <div class="modal-confirm" id="modal-confirm">
+    <div class="modal-confirm-box">
+      <p id="confirm-text">Удалить запись?</p>
+      <div class="modal-confirm-btns">
+        <button class="btn-sm danger" id="confirm-yes">ДА</button>
+        <button class="btn-sm" onclick="closeConfirm()">ОТМЕНА</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    let confirmCallback = null;
+
+    function showToast(msg, type='success') {
+      const t=document.getElementById('toast');
+      t.textContent=msg;
+      t.className='toast '+type+' show';
+      setTimeout(()=>t.classList.remove('show'), 2500);
+    }
+
+    function showConfirm(text, callback) {
+      document.getElementById('confirm-text').textContent=text;
+      document.getElementById('modal-confirm').classList.add('active');
+      confirmCallback=callback;
+    }
+
+    function closeConfirm() {
+      document.getElementById('modal-confirm').classList.remove('active');
+      confirmCallback=null;
+    }
+
+    document.getElementById('confirm-yes').addEventListener('click', ()=>{
+      if(confirmCallback) confirmCallback();
+      closeConfirm();
+    });
+
+    function handleFormSubmit(e, form, msg) {
+      e.preventDefault();
+      const data=new FormData(form);
+      fetch(form.action, {method:'POST',body:data})
+        .then(r=>{if(r.ok){showToast(msg,'success');form.reset();document.getElementById('cover-preview').innerHTML=''}else{showToast('Ошибка','error')}})
+        .catch(()=>showToast('Ошибка','error'));
+      return false;
+    }
+
     function switchTab(name) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.querySelector('.tab[onclick*="'+name+'"]').classList.add('active');
+      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+      document.querySelector('.tab[onclick*=\"'+name+'\"]').classList.add('active');
       document.getElementById('tab-'+name).classList.add('active');
       if(name==='tracks') loadTracks();
       if(name==='videos') loadVideos();
       if(name==='concerts') loadConcerts();
+      if(name==='orders') loadOrders();
       if(name==='gallery') loadGallery();
       if(name==='about') loadAbout();
       if(name==='design') loadDesign();
@@ -215,130 +298,196 @@
     }
 
     function previewImage(input, previewId) {
-      const preview = document.getElementById(previewId);
-      preview.innerHTML = '';
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => { const img = document.createElement('img'); img.src = e.target.result; preview.appendChild(img); };
+      const preview=document.getElementById(previewId);
+      preview.innerHTML='';
+      if(input.files&&input.files[0]){
+        const reader=new FileReader();
+        reader.onload=(e)=>{const img=document.createElement('img');img.src=e.target.result;preview.appendChild(img);};
         reader.readAsDataURL(input.files[0]);
       }
     }
 
+    function filterTable(tableId, query) {
+      const rows=document.querySelectorAll('#'+tableId+' table tbody tr');
+      const q=query.toLowerCase();
+      rows.forEach(row=>row.style.display=row.textContent.toLowerCase().includes(q)?'':'none');
+    }
+
+    function exportTable(tableId, name) {
+      const table=document.querySelector('#'+tableId+' table');
+      if(!table) return showToast('Нет данных','error');
+      let csv='';
+      table.querySelectorAll('tr').forEach(row=>{
+        const cols=[];
+        row.querySelectorAll('th,td').forEach(cell=>cols.push('"'+cell.textContent.replace(/"/g,'""')+'"'));
+        csv+=cols.join(',')+'\n';
+      });
+      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download=name+'.csv';a.click();
+    }
+
     async function loadTracks() {
-      const res = await fetch('/api/tracks');
-      const data = await res.json();
-      const c = document.getElementById('tracks-table');
-      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ ТРЕКОВ</div>'; return; }
-      c.innerHTML = '<table><tr><th>ОБЛОЖКА</th><th>НАЗВАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr>'
-        + data.map(t => '<tr><td>'+(t.cover?'<img src="/uploads/'+t.cover+'" style="width:50px;height:50px;object-fit:cover">':'—')+'</td><td>'+t.title+'</td><td><a href="'+t.file+'" target="_blank" style="color:#c00;text-decoration:none">ОТКРЫТЬ</a></td><td><button class="btn-sm danger" onclick="deleteItem(\'track\','+t.id+')">УДАЛИТЬ</button></td></tr>').join('')+'</table>';
+      const res=await fetch('/api/tracks');
+      const data=await res.json();
+      const c=document.getElementById('tracks-table');
+      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ ТРЕКОВ</div>';return}
+      c.innerHTML='<table><thead><tr><th>ОБЛОЖКА</th><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
+        +data.map(t=>'<tr><td>'+(t.cover?'<img src=\"/uploads/'+t.cover+'\" style=\"width:50px;height:50px;object-fit:cover\">':'—')+'</td><td>'+t.title+'</td><td>'+(t.description||'—')+'</td><td><a href=\"'+t.file+'\" target=\"_blank\" style=\"color:#c00;text-decoration:none\">ОТКРЫТЬ</a></td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'track\\','+t.id+')\">УДАЛИТЬ</button></td></tr>').join('')
+        +'</tbody></table>';
     }
 
     async function loadVideos() {
-      const res = await fetch('/api/videos');
-      const data = await res.json();
-      const c = document.getElementById('videos-table');
-      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ ВИДЕО</div>'; return; }
-      c.innerHTML = '<table><tr><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr>'
-        + data.map(v => '<tr><td>'+v.title+'</td><td>'+(v.description||'—')+'</td><td><a href="'+v.youtube_url+'" target="_blank" style="color:#c00;text-decoration:none">ОТКРЫТЬ</a></td><td><button class="btn-sm danger" onclick="deleteItem(\'video\','+v.id+')">УДАЛИТЬ</button></td></tr>').join('')+'</table>';
+      const res=await fetch('/api/videos');
+      const data=await res.json();
+      const c=document.getElementById('videos-table');
+      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ ВИДЕО</div>';return}
+      c.innerHTML='<table><thead><tr><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
+        +data.map(v=>'<tr><td>'+v.title+'</td><td>'+(v.description||'—')+'</td><td><a href=\"'+v.youtube_url+'\" target=\"_blank\" style=\"color:#c00;text-decoration:none\">ОТКРЫТЬ</a></td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'video\\','+v.id+')\">УДАЛИТЬ</button></td></tr>').join('')
+        +'</tbody></table>';
     }
 
     async function loadConcerts() {
-      const res = await fetch('/api/concerts');
-      const data = await res.json();
-      const c = document.getElementById('concerts-table');
-      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ КОНЦЕРТОВ</div>'; return; }
-      c.innerHTML = '<table><tr><th>ДАТА</th><th>ГОРОД</th><th>ПЛОЩАДКА</th><th>БИЛЕТЫ</th><th>ДЕЙСТВИЯ</th></tr>'
-        + data.map(co => '<tr><td>'+co.date+' '+(co.time||'')+'</td><td>'+co.city+'</td><td>'+(co.venue||'—')+'</td><td>'+(co.ticket_url?'<a href="'+co.ticket_url+'" target="_blank" style="color:#c00;text-decoration:none">ОТКРЫТЬ</a>':'—')+'</td><td><button class="btn-sm danger" onclick="deleteItem(\'concert\','+co.id+')">УДАЛИТЬ</button></td></tr>').join('')+'</table>';
+      const res=await fetch('/api/concerts');
+      const data=await res.json();
+      const c=document.getElementById('concerts-table');
+      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ МЕРОПРИЯТИЙ</div>';return}
+      c.innerHTML='<table><thead><tr><th>ДАТА</th><th>ГОРОД</th><th>ПЛОЩАДКА</th><th>БИЛЕТЫ</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
+        +data.map(co=>'<tr><td>'+co.date+' '+(co.time||'')+'</td><td>'+co.city+'</td><td>'+(co.venue||'—')+'</td><td>'+(co.ticket_url?'<a href=\"'+co.ticket_url+'\" target=\"_blank\" style=\"color:#c00;text-decoration:none\">ОТКРЫТЬ</a>':'—')+'</td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'concert\\','+co.id+')\">УДАЛИТЬ</button></td></tr>').join('')
+        +'</tbody></table>';
+    }
+
+    async function loadOrders() {
+      const res=await fetch('/api/admin/orders');
+      const data=await res.json();
+      const c=document.getElementById('orders-table');
+      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ ЗАЯВОК</div>';return}
+      c.innerHTML='<table><thead><tr><th>ДАТА</th><th>ИМЯ</th><th>EMAIL</th><th>ТЕЛЕФОН</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
+        +data.map(o=>'<tr><td>'+new Date(o.created).toLocaleString('ru')+'</td><td>'+o.name+'</td><td>'+o.email+'</td><td>'+o.phone+'</td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'order\\','+o.id+')\">УДАЛИТЬ</button></td></tr>').join('')
+        +'</tbody></table>';
+      updateOrdersBadge(data.length);
+    }
+
+    function updateOrdersBadge(count) {
+      const badge=document.getElementById('orders-badge');
+      const tabBadge=document.getElementById('orders-tab-badge');
+      const countEl=document.getElementById('orders-count');
+      if(count>0){
+        badge.style.display='block';
+        tabBadge.style.display='flex';
+        tabBadge.textContent=count;
+        countEl.textContent=count;
+      } else {
+        badge.style.display='none';
+        tabBadge.style.display='none';
+      }
     }
 
     async function loadGallery() {
-      const res = await fetch('/api/gallery');
-      const data = await res.json();
-      const c = document.getElementById('gallery-admin');
-      if (!data.length) { c.innerHTML = '<div class="empty">НЕТ ИЗОБРАЖЕНИЙ</div>'; return; }
-      c.innerHTML = data.map(g => '<div class="gallery-thumb"><img src="/uploads/'+g.file+'"><div class="overlay"><strong>'+g.title+'</strong><br>'+g.description+'<br><button class="btn-sm danger" onclick="deleteItem(\'gallery\','+g.id+')" style="margin-top:5px">УДАЛИТЬ</button></div></div>').join('');
+      const res=await fetch('/api/gallery');
+      const data=await res.json();
+      const c=document.getElementById('gallery-admin');
+      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ ИЗОБРАЖЕНИЙ</div>';return}
+      c.innerHTML=data.map(g=>'<div class=\"gallery-thumb\"><img src=\"/uploads/'+g.file+'\"><div class=\"overlay\"><strong>'+g.title+'</strong><br>'+g.description+'<br><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'gallery\\','+g.id+')\" style=\"margin-top:5px\">УДАЛИТЬ</button></div></div>').join('');
     }
 
     async function loadAbout() {
-      const res = await fetch('/api/about');
-      const data = await res.json();
-      document.getElementById('about-text').value = data.text || '';
-      document.getElementById('stat1-num').value = data.stat1 || '150+';
-      document.getElementById('stat1-label').value = data.stat1label || 'ПЕСЕН';
-      document.getElementById('stat2-num').value = data.stat2 || '15';
-      document.getElementById('stat2-label').value = data.stat2label || 'ЛЕТ НА СЦЕНЕ';
-      document.getElementById('stat3-num').value = data.stat3 || '3';
-      document.getElementById('stat3-label').value = data.stat3label || 'СЕЗОН ГОЛОС';
+      const res=await fetch('/api/about');
+      const data=await res.json();
+      document.getElementById('about-text').value=data.text||'';
+      document.getElementById('stat1-num').value=data.stat1||'150+';
+      document.getElementById('stat1-label').value=data.stat1label||'ПЕСЕН';
+      document.getElementById('stat2-num').value=data.stat2||'15';
+      document.getElementById('stat2-label').value=data.stat2label||'ЛЕТ НА СЦЕНЕ';
+      document.getElementById('stat3-num').value=data.stat3||'3';
+      document.getElementById('stat3-label').value=data.stat3label||'СЕЗОН ГОЛОС';
     }
 
     async function loadDesign() {
-      const res = await fetch('/api/design');
-      const data = await res.json();
-      if (data.accent) document.getElementById('accent-color').value = data.accent;
-      if (data.bg) document.getElementById('bg-color').value = data.bg;
-      if (data.text) document.getElementById('text-color').value = data.text;
-      if (data.headingFont) document.getElementById('heading-font').value = data.headingFont;
-      if (data.bodyFont) document.getElementById('body-font').value = data.bodyFont;
+      const res=await fetch('/api/design');
+      const data=await res.json();
+      if(data.accent) document.getElementById('accent-color').value=data.accent;
+      if(data.bg) document.getElementById('bg-color').value=data.bg;
+      if(data.text) document.getElementById('text-color').value=data.text;
+      if(data.headingFont) document.getElementById('heading-font').value=data.headingFont;
+      if(data.bodyFont) document.getElementById('body-font').value=data.bodyFont;
     }
 
     async function loadStats() {
-      const [tracks, videos, concerts] = await Promise.all([
-        fetch('/api/tracks').then(r => r.json()),
-        fetch('/api/videos').then(r => r.json()),
-        fetch('/api/concerts').then(r => r.json())
+      const [tracks,videos,concerts,orders]=await Promise.all([
+        fetch('/api/tracks').then(r=>r.json()),
+        fetch('/api/videos').then(r=>r.json()),
+        fetch('/api/concerts').then(r=>r.json()),
+        fetch('/api/admin/orders').then(r=>r.json()).catch(()=>[])
       ]);
-      document.getElementById('stat-tracks').textContent = tracks.length;
-      document.getElementById('stat-videos').textContent = videos.length;
-      document.getElementById('stat-concerts').textContent = concerts.length;
+      document.getElementById('stat-tracks').textContent=tracks.length;
+      document.getElementById('stat-videos').textContent=videos.length;
+      document.getElementById('stat-concerts').textContent=concerts.length;
+      document.getElementById('stat-orders').textContent=orders.length;
     }
 
-    async function deleteItem(type, id) {
-      if (!confirm('Удалить '+type+' #'+id+'?')) return;
-      try {
-        await fetch('/api/admin/'+type+'/'+id, { method: 'DELETE' });
-        if (type === 'track') loadTracks();
-        if (type === 'video') loadVideos();
-        if (type === 'concert') loadConcerts();
-        if (type === 'gallery') loadGallery();
-      } catch (e) { alert('ОШИБКА'); }
+    function deleteItem(type, id) {
+      showConfirm('Удалить '+type+' #'+id+'? Это действие нельзя отменить.', async ()=>{
+        try {
+          const res=await fetch('/api/admin/'+type+'/'+id, {method:'DELETE'});
+          if(res.ok){
+            showToast('Удалено','success');
+            if(type==='track') loadTracks();
+            if(type==='video') loadVideos();
+            if(type==='concert') loadConcerts();
+            if(type==='order') loadOrders();
+            if(type==='gallery') loadGallery();
+          } else {showToast('Ошибка удаления','error')}
+        } catch(e){showToast('Ошибка','error')}
+      });
     }
 
     // Сохранение «Об артисте»
     document.getElementById('about-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const text = document.getElementById('about-text').value;
-      await fetch('/api/admin/about', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text}) });
-      alert('СОХРАНЕНО. Обнови сайт.');
+      const text=document.getElementById('about-text').value;
+      try {
+        await fetch('/api/admin/about', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+        showToast('Текст сохранён','success');
+      } catch(e){showToast('Ошибка','error')}
     });
 
     // Сохранение статистики
     document.getElementById('stats-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const data = {
-        stat1: document.getElementById('stat1-num').value,
-        stat1label: document.getElementById('stat1-label').value,
-        stat2: document.getElementById('stat2-num').value,
-        stat2label: document.getElementById('stat2-label').value,
-        stat3: document.getElementById('stat3-num').value,
-        stat3label: document.getElementById('stat3-label').value
+      const data={
+        stat1:document.getElementById('stat1-num').value,
+        stat1label:document.getElementById('stat1-label').value,
+        stat2:document.getElementById('stat2-num').value,
+        stat2label:document.getElementById('stat2-label').value,
+        stat3:document.getElementById('stat3-num').value,
+        stat3label:document.getElementById('stat3-label').value
       };
-      await fetch('/api/admin/about/stats', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
-      alert('СОХРАНЕНО. Обнови сайт.');
+      try {
+        await fetch('/api/admin/about/stats', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        showToast('Цифры сохранены','success');
+      } catch(e){showToast('Ошибка','error')}
     });
 
     // Сохранение дизайна
     document.getElementById('design-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const data = {
-        accent: document.getElementById('accent-color').value,
-        bg: document.getElementById('bg-color').value,
-        text: document.getElementById('text-color').value,
-        headingFont: document.getElementById('heading-font').value,
-        bodyFont: document.getElementById('body-font').value
+      const data={
+        accent:document.getElementById('accent-color').value,
+        bg:document.getElementById('bg-color').value,
+        text:document.getElementById('text-color').value,
+        headingFont:document.getElementById('heading-font').value,
+        bodyFont:document.getElementById('body-font').value
       };
-      await fetch('/api/admin/design', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
-      alert('ДИЗАЙН ОБНОВЛЁН. Обнови сайт.');
+      try {
+        await fetch('/api/admin/design', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        showToast('Дизайн обновлён','success');
+      } catch(e){showToast('Ошибка','error')}
     });
+
+    // Загружаем заявки при старте для бейджа
+    fetch('/api/admin/orders').then(r=>r.json()).then(d=>updateOrdersBadge(d.length)).catch(()=>{});
   </script>
 </body>
 </html>

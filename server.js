@@ -202,6 +202,10 @@ app.delete('/api/admin/concert/:id', adminAuth, (req, res) => {
   try { db.run('DELETE FROM concerts WHERE id = ?', [req.params.id]); saveDatabase(); res.json({ok:true}); } catch(e) { res.status(500).json({error:e.message}); }
 });
 
+app.delete('/api/admin/order/:id', adminAuth, (req, res) => {
+  try { db.run('DELETE FROM orders WHERE id = ?', [req.params.id]); saveDatabase(); res.json({ok:true}); } catch(e) { res.status(500).json({error:e.message}); }
+});
+
 app.delete('/api/admin/gallery/:id', adminAuth, (req, res) => {
   try { db.run('DELETE FROM gallery WHERE id = ?', [req.params.id]); saveDatabase(); res.json({ok:true}); } catch(e) { res.status(500).json({error:e.message}); }
 });
