@@ -282,92 +282,28 @@
       return false;
     }
 
-    function switchTab(name) {
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-      document.querySelector('.tab[onclick*=\"'+name+'\"]').classList.add('active');
-      document.getElementById('tab-'+name).classList.add('active');
-      if(name==='tracks') loadTracks();
-      if(name==='videos') loadVideos();
-      if(name==='concerts') loadConcerts();
-      if(name==='orders') loadOrders();
-      if(name==='gallery') loadGallery();
-      if(name==='about') loadAbout();
-      if(name==='design') loadDesign();
-      if(name==='stats') loadStats();
+    
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+  var tabs = document.querySelectorAll('.tab');
+  tabs.forEach(function(t) {
+    if (t.getAttribute('onclick') && t.getAttribute('onclick').indexOf("' + name + '") > -1) {
+      t.classList.add('active');
     }
+  });
+  var content = document.getElementById('tab-' + name);
+  if (content) content.classList.add('active');
+  if (name === 'tracks') loadTracks();
+  if (name === 'videos') loadVideos();
+  if (name === 'concerts') loadConcerts();
+  if (name === 'orders') loadOrders();
+  if (name === 'gallery') loadGallery();
+  if (name === 'about') loadAbout();
+  if (name === 'design') loadDesign();
+  if (name === 'stats') loadStats();
+}
 
-    function previewImage(input, previewId) {
-      const preview=document.getElementById(previewId);
-      preview.innerHTML='';
-      if(input.files&&input.files[0]){
-        const reader=new FileReader();
-        reader.onload=(e)=>{const img=document.createElement('img');img.src=e.target.result;preview.appendChild(img);};
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
-
-    function filterTable(tableId, query) {
-      const rows=document.querySelectorAll('#'+tableId+' table tbody tr');
-      const q=query.toLowerCase();
-      rows.forEach(row=>row.style.display=row.textContent.toLowerCase().includes(q)?'':'none');
-    }
-
-    function exportTable(tableId, name) {
-      const table=document.querySelector('#'+tableId+' table');
-      if(!table) return showToast('Нет данных','error');
-      let csv='';
-      table.querySelectorAll('tr').forEach(row=>{
-        const cols=[];
-        row.querySelectorAll('th,td').forEach(cell=>cols.push('"'+cell.textContent.replace(/"/g,'""')+'"'));
-        csv+=cols.join(',')+'\n';
-      });
-      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download=name+'.csv';a.click();
-    }
-
-    async function loadTracks() {
-      const res=await fetch('/api/tracks');
-      const data=await res.json();
-      const c=document.getElementById('tracks-table');
-      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ ТРЕКОВ</div>';return}
-      c.innerHTML='<table><thead><tr><th>ОБЛОЖКА</th><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
-        +data.map(t=>'<tr><td>'+(t.cover?'<img src=\"/uploads/'+t.cover+'\" style=\"width:50px;height:50px;object-fit:cover\">':'—')+'</td><td>'+t.title+'</td><td>'+(t.description||'—')+'</td><td><a href=\"'+t.file+'\" target=\"_blank\" style=\"color:#c00;text-decoration:none\">ОТКРЫТЬ</a></td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'track\\','+t.id+')\">УДАЛИТЬ</button></td></tr>').join('')
-        +'</tbody></table>';
-    }
-
-    async function loadVideos() {
-      const res=await fetch('/api/videos');
-      const data=await res.json();
-      const c=document.getElementById('videos-table');
-      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ ВИДЕО</div>';return}
-      c.innerHTML='<table><thead><tr><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
-        +data.map(v=>'<tr><td>'+v.title+'</td><td>'+(v.description||'—')+'</td><td><a href=\"'+v.youtube_url+'\" target=\"_blank\" style=\"color:#c00;text-decoration:none\">ОТКРЫТЬ</a></td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'video\\','+v.id+')\">УДАЛИТЬ</button></td></tr>').join('')
-        +'</tbody></table>';
-    }
-
-    async function loadConcerts() {
-      const res=await fetch('/api/concerts');
-      const data=await res.json();
-      const c=document.getElementById('concerts-table');
-      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ МЕРОПРИЯТИЙ</div>';return}
-      c.innerHTML='<table><thead><tr><th>ДАТА</th><th>ГОРОД</th><th>ПЛОЩАДКА</th><th>БИЛЕТЫ</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
-        +data.map(co=>'<tr><td>'+co.date+' '+(co.time||'')+'</td><td>'+co.city+'</td><td>'+(co.venue||'—')+'</td><td>'+(co.ticket_url?'<a href=\"'+co.ticket_url+'\" target=\"_blank\" style=\"color:#c00;text-decoration:none\">ОТКРЫТЬ</a>':'—')+'</td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'concert\\','+co.id+')\">УДАЛИТЬ</button></td></tr>').join('')
-        +'</tbody></table>';
-    }
-
-    async function loadOrders() {
-      const res=await fetch('/api/admin/orders');
-      const data=await res.json();
-      const c=document.getElementById('orders-table');
-      if(!data.length){c.innerHTML='<div class=\"empty\">НЕТ ЗАЯВОК</div>';return}
-      c.innerHTML='<table><thead><tr><th>ДАТА</th><th>ИМЯ</th><th>EMAIL</th><th>ТЕЛЕФОН</th><th>ДЕЙСТВИЯ</th></tr></thead><tbody>'
-        +data.map(o=>'<tr><td>'+new Date(o.created).toLocaleString('ru')+'</td><td>'+o.name+'</td><td>'+o.email+'</td><td>'+o.phone+'</td><td><button class=\"btn-sm danger\" onclick=\"deleteItem(\\'order\\','+o.id+')\">УДАЛИТЬ</button></td></tr>').join('')
-        +'</tbody></table>';
-      updateOrdersBadge(data.length);
-    }
 
     function updateOrdersBadge(count) {
       const badge=document.getElementById('orders-badge');
