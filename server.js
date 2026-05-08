@@ -3,15 +3,15 @@ const multer = require('multer');
 const initSqlJs = require('sql.js');
 const basicAuth = require('express-basic-auth');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
+const port = process.env.PORT || 3000;
 let db;
 
-// Загружаем sql.js
 initSqlJs().then(SQL => {
   db = new SQL.Database();
   
-  // Создаём таблицы
   db.run('CREATE TABLE IF NOT EXISTS tracks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, file TEXT, cover TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP)');
   db.run('CREATE TABLE IF NOT EXISTS videos (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, youtube_url TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP)');
   db.run('CREATE TABLE IF NOT EXISTS concerts (id INTEGER PRIMARY KEY AUTOINCREMENT, city TEXT, venue TEXT, date TEXT, time TEXT, ticket_url TEXT, description TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP)');
@@ -28,6 +28,8 @@ initSqlJs().then(SQL => {
     db.run('INSERT INTO videos (title, description, youtube_url) VALUES (?,?,?)', ['Молитва (Live)', 'Выступление', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ']);
     db.run('INSERT INTO concerts (city, venue, date, time, ticket_url) VALUES (?,?,?,?,?)', ['Москва', 'Крокус Сити Холл', '15.06.2026', '19:00', '#']);
   }
+
+  app.listen(port, () => console.log('Server running on port ' + port));
 });
 
 const storage = multer.memoryStorage();
@@ -40,7 +42,6 @@ app.use(express.static('public'));
 const adminAuth = basicAuth({ users: { 'admin': 'music123' }, challenge: true });
 app.use('/admin', adminAuth, express.static('admin'));
 
-// API
 app.get('/api/tracks', (req, res) => {
   try { const r = db.exec('SELECT * FROM tracks ORDER BY created DESC'); res.json(r.length ? r[0].values.map(v => ({id:v[0],title:v[1],description:v[2],file:v[3],cover:v[4]})) : []); } catch(e) { res.json([]); }
 });
@@ -99,5 +100,3 @@ app.post('/api/admin/design', adminAuth, (req, res) => {
   Object.keys(d).forEach(k => db.run('INSERT OR REPLACE INTO settings (key,value) VALUES (?,?)', [k, d[k]||'']));
   res.json({ok:true});
 });
-
-module.exports = app;
