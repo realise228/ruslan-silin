@@ -124,8 +124,8 @@ document.getElementById('order-form').addEventListener('submit',async function(e
 });
 </script>
 
-<div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
-  <span class="lightbox-close">&times;</span>
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('active');document.body.style.cursor='none';document.querySelector('.cursor').style.display='block';document.querySelector('.cursor-dot').style.display='block'">
+  <span class="lightbox-close" onclick="var lb=document.getElementById('lightbox');lb.classList.remove('active');document.body.style.cursor='none';document.querySelector('.cursor').style.display='block';document.querySelector('.cursor-dot').style.display='block'">&times;</span>
   <img src="" id="lightbox-img">
 </div>
 </body></html>
