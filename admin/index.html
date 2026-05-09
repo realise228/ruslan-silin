@@ -3,125 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>АДМИН</title>
+<title>АДМИН // РУСЛАН СИЛИН</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{background:#0a0a0a;color:#fff;font-family:sans-serif;padding:20px}
-.tabs{display:flex;gap:5px;margin-bottom:20px;flex-wrap:wrap}
-.tab{padding:10px 15px;background:#111;border:1px solid #333;cursor:pointer;color:#fff;font-size:14px}
-.tab.active{background:#c00;border-color:#c00}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#fff;font-family:'Oswald',sans-serif;padding:30px;text-transform:uppercase;letter-spacing:1px}
+.container{max-width:1200px;margin:0 auto}
+h1{font-size:2.5rem;font-weight:700;margin-bottom:20px;letter-spacing:8px;border-bottom:2px solid #c00;padding-bottom:20px}
+h2{font-size:1.1rem;margin-bottom:15px;color:#c00;letter-spacing:4px;font-weight:400}
+.tabs{display:flex;gap:4px;margin-bottom:30px;flex-wrap:wrap}
+.tab{padding:12px 18px;background:#111;border:1px solid #1a1a1a;cursor:pointer;transition:0.2s;font-family:'Oswald',sans-serif;letter-spacing:3px;font-size:12px;color:#fff}
+.tab.active,.tab:hover{background:#c00;border-color:#c00}
 .tab-content{display:none}
 .tab-content.active{display:block}
-form{background:#111;padding:20px;margin-bottom:20px;max-width:400px}
-input,textarea,button{display:block;width:100%;padding:10px;margin:10px 0;background:#1a1a1a;border:1px solid #333;color:#fff}
-button{background:#c00;cursor:pointer;border:none}
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;text-align:left;border-bottom:1px solid #333}
-th{color:#c00}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-bottom:30px}
+form{background:#111;border:1px solid #1a1a1a;padding:25px;margin-bottom:20px}
+input,textarea,button{width:100%;padding:14px;margin:8px 0;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;font-family:'Roboto Mono',monospace;font-size:13px;letter-spacing:1px}
+textarea{min-height:80px;resize:vertical;text-transform:none}
+input:focus,textarea:focus{outline:none;border-color:#c00}
+input[type="file"]{padding:10px;cursor:pointer}
+input[type="file"]::file-selector-button{background:#c00;border:0;padding:8px 16px;color:#fff;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:2px;cursor:pointer;margin-right:12px}
+button{background:#c00;border:0;font-weight:600;cursor:pointer;transition:0.2s;margin-top:10px;font-size:14px;letter-spacing:3px}
+button:hover{background:#a00}
+label{display:block;margin-top:12px;color:#888;font-size:11px;letter-spacing:2px}
+table{width:100%;border-collapse:collapse;margin-bottom:20px}
+th,td{padding:12px 15px;text-align:left;border-bottom:1px solid #1a1a1a;font-size:12px}
+th{background:#111;color:#c00;letter-spacing:3px;font-weight:400;position:sticky;top:0}
+td{font-family:'Roboto Mono',monospace;text-transform:none;word-break:break-word}
+tr:hover td{background:#111}
+.back-link{display:block;text-align:center;margin-top:40px;color:#555;text-decoration:none;letter-spacing:4px;font-size:12px}
+.back-link:hover{color:#c00}
+.empty{text-align:center;padding:40px;color:#444;font-family:'Roboto Mono',monospace;font-size:14px}
 </style>
 </head>
 <body>
-<h1>АДМИН</h1>
-<div class="tabs">
-  <div class="tab active" onclick="showTab('add')">ДОБАВИТЬ</div>
-  <div class="tab" onclick="showTab('tracks')">ТРЕКИ</div>
-  <div class="tab" onclick="showTab('videos')">ВИДЕО</div>
-  <div class="tab" onclick="showTab('concerts')">МЕРОПРИЯТИЯ</div>
-  <div class="tab" onclick="showTab('gallery')">ГАЛЕРЕЯ</div>
+<div class="container">
+<h1>АДМИН-ПАНЕЛЬ</h1>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-tab="add">ДОБАВИТЬ</div>
+  <div class="tab" data-tab="tracks">ТРЕКИ</div>
+  <div class="tab" data-tab="videos">ВИДЕО</div>
+  <div class="tab" data-tab="concerts">МЕРОПРИЯТИЯ</div>
+  <div class="tab" data-tab="gallery">ГАЛЕРЕЯ</div>
+  <div class="tab" data-tab="about">ОБ АРТИСТЕ</div>
+  <div class="tab" data-tab="design">ДИЗАЙН</div>
+  <div class="tab" data-tab="stats">СТАТИСТИКА</div>
 </div>
 
 <div class="tab-content active" id="tab-add">
-  <form action="/api/admin/track" method="POST" enctype="multipart/form-data">
-    <h2>ДОБАВИТЬ ТРЕК</h2>
-    <input name="title" placeholder="НАЗВАНИЕ" required>
+  <div class="admin-grid">
+    <div>
+      <form action="/api/admin/track" method="POST" enctype="multipart/form-data">
+        <h2>ДОБАВИТЬ ССЫЛКУ НА МУЗЫКУ</h2>
+        <input name="title" placeholder="НАЗВАНИЕ" required>
+        <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
+        <input name="url" placeholder="ССЫЛКА (ЯНДЕКС МУЗЫКА / VK)" required>
+        <label>ОБЛОЖКА</label>
+        <input type="file" name="cover" accept="image/*">
+        <button type="submit">ДОБАВИТЬ</button>
+      </form>
+    </div>
+    <div>
+      <form action="/api/admin/video" method="POST">
+        <h2>ДОБАВИТЬ ВИДЕО</h2>
+        <input name="title" placeholder="НАЗВАНИЕ" required>
+        <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
+        <input name="youtube_url" placeholder="ССЫЛКА НА YOUTUBE" required>
+        <button type="submit">ДОБАВИТЬ</button>
+      </form>
+      <form action="/api/admin/concert" method="POST" style="margin-top:20px">
+        <h2>ДОБАВИТЬ МЕРОПРИЯТИЕ</h2>
+        <input name="city" placeholder="ГОРОД" required>
+        <input name="venue" placeholder="ПЛОЩАДКА">
+        <input name="date" placeholder="ДАТА (15.05.2026)" required>
+        <input name="time" placeholder="ВРЕМЯ">
+        <input name="ticket_url" placeholder="ССЫЛКА НА БИЛЕТЫ">
+        <textarea name="description" placeholder="ДОП. ИНФОРМАЦИЯ"></textarea>
+        <button type="submit">ДОБАВИТЬ</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-tracks"><h2>ВСЕ ТРЕКИ</h2><div id="tracks-table"><div class="empty">ЗАГРУЗКА...</div></div></div>
+<div class="tab-content" id="tab-videos"><h2>ВСЕ ВИДЕО</h2><div id="videos-table"><div class="empty">ЗАГРУЗКА...</div></div></div>
+<div class="tab-content" id="tab-concerts"><h2>ВСЕ МЕРОПРИЯТИЯ</h2><div id="concerts-table"><div class="empty">ЗАГРУЗКА...</div></div></div>
+
+<div class="tab-content" id="tab-gallery">
+  <h2>ДОБАВИТЬ ФОТО</h2>
+  <form action="/api/admin/gallery" method="POST" enctype="multipart/form-data" style="max-width:500px">
+    <input name="title" placeholder="ЗАГОЛОВОК">
     <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
-    <input name="url" placeholder="ССЫЛКА" required>
-    <input type="file" name="cover" accept="image/*">
-    <button>ДОБАВИТЬ</button>
+    <label>ИЗОБРАЖЕНИЕ</label>
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit">ДОБАВИТЬ</button>
   </form>
-  <form action="/api/admin/video" method="POST">
-    <h2>ДОБАВИТЬ ВИДЕО</h2>
-    <input name="title" placeholder="НАЗВАНИЕ" required>
-    <textarea name="description" placeholder="ОПИСАНИЕ"></textarea>
-    <input name="youtube_url" placeholder="ССЫЛКА YOUTUBE" required>
-    <button>ДОБАВИТЬ</button>
-  </form>
-  <form action="/api/admin/concert" method="POST">
-    <h2>ДОБАВИТЬ МЕРОПРИЯТИЕ</h2>
-    <input name="city" placeholder="ГОРОД" required>
-    <input name="venue" placeholder="ПЛОЩАДКА">
-    <input name="date" placeholder="ДАТА" required>
-    <input name="time" placeholder="ВРЕМЯ">
-    <input name="ticket_url" placeholder="ССЫЛКА НА БИЛЕТЫ">
-    <button>ДОБАВИТЬ</button>
+  <h2 style="margin-top:30px">ВСЕ ФОТО</h2>
+  <div id="gallery-table"><div class="empty">ЗАГРУЗКА...</div></div>
+</div>
+
+<div class="tab-content" id="tab-about">
+  <h2>ТЕКСТ «ОБ АРТИСТЕ»</h2>
+  <form id="about-form" style="max-width:600px">
+    <textarea id="about-text" rows="12" style="text-transform:none"></textarea>
+    <button type="submit">СОХРАНИТЬ</button>
   </form>
 </div>
 
-<div class="tab-content" id="tab-tracks"><h2>ТРЕКИ</h2><div id="tracks-table">Загрузка...</div></div>
-<div class="tab-content" id="tab-videos"><h2>ВИДЕО</h2><div id="videos-table">Загрузка...</div></div>
-<div class="tab-content" id="tab-concerts"><h2>МЕРОПРИЯТИЯ</h2><div id="concerts-table">Загрузка...</div></div>
-<div class="tab-content" id="tab-gallery">
-  <h2>ГАЛЕРЕЯ</h2>
-  <form action="/api/admin/gallery" method="POST" enctype="multipart/form-data">
-    <input name="title" placeholder="ЗАГОЛОВОК">
-    <input type="file" name="image" accept="image/*" required>
-    <button>ДОБАВИТЬ</button>
+<div class="tab-content" id="tab-design">
+  <h2>ЦВЕТОВАЯ СХЕМА</h2>
+  <form id="design-form" style="max-width:400px">
+    <label>АКЦЕНТ</label>
+    <input type="color" id="accent-color" value="#cc0000">
+    <label>ФОН</label>
+    <input type="color" id="bg-color" value="#000000">
+    <label>ТЕКСТ</label>
+    <input type="color" id="text-color" value="#ffffff">
+    <button type="submit">ПРИМЕНИТЬ</button>
   </form>
-  <div id="gallery-table">Загрузка...</div>
+</div>
+
+<div class="tab-content" id="tab-stats">
+  <div class="admin-grid">
+    <div style="background:#111;border:1px solid #1a1a1a;padding:25px;text-align:center"><h2>ТРЕКИ</h2><div style="font-size:3rem;color:#c00;font-weight:700" id="stat-tracks">-</div></div>
+    <div style="background:#111;border:1px solid #1a1a1a;padding:25px;text-align:center"><h2>ВИДЕО</h2><div style="font-size:3rem;color:#c00;font-weight:700" id="stat-videos">-</div></div>
+    <div style="background:#111;border:1px solid #1a1a1a;padding:25px;text-align:center"><h2>МЕРОПРИЯТИЯ</h2><div style="font-size:3rem;color:#c00;font-weight:700" id="stat-concerts">-</div></div>
+    <div style="background:#111;border:1px solid #1a1a1a;padding:25px;text-align:center"><h2>ЗАЯВКИ</h2><div style="font-size:3rem;color:#c00;font-weight:700" id="stat-orders">-</div></div>
+  </div>
+</div>
+
+<a href="/" class="back-link">[ ВЕРНУТЬСЯ НА САЙТ ]</a>
 </div>
 
 <script>
-function showTab(name) {
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-  document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active')});
-  document.getElementById('tab-'+name).classList.add('active');
-  var tabs = document.querySelectorAll('.tab');
-  for(var i=0;i<tabs.length;i++) {
-    if(tabs[i].textContent.toLowerCase().indexOf(name) !== -1 || 
-       (name==='add' && tabs[i].textContent==='ДОБАВИТЬ') ||
-       (name==='tracks' && tabs[i].textContent==='ТРЕКИ') ||
-       (name==='videos' && tabs[i].textContent==='ВИДЕО') ||
-       (name==='concerts' && tabs[i].textContent==='МЕРОПРИЯТИЯ') ||
-       (name==='gallery' && tabs[i].textContent==='ГАЛЕРЕЯ')) {
-      tabs[i].classList.add('active');
-    }
-  }
-  if(name==='tracks') loadTracks();
-  if(name==='videos') loadVideos();
-  if(name==='concerts') loadConcerts();
-  if(name==='gallery') loadGallery();
-}
+var tabs = document.querySelectorAll('#tabs .tab');
+tabs.forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    var name = this.getAttribute('data-tab');
+    tabs.forEach(function(t){t.classList.remove('active')});
+    this.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active')});
+    document.getElementById('tab-'+name).classList.add('active');
+    if(name==='tracks') loadTracks();
+    if(name==='videos') loadVideos();
+    if(name==='concerts') loadConcerts();
+    if(name==='gallery') loadGallery();
+    if(name==='about') loadAbout();
+    if(name==='design') loadDesign();
+    if(name==='stats') loadStats();
+  });
+});
 
 function loadTracks() {
   fetch('/api/tracks').then(function(r){return r.json()}).then(function(d){
     var c=document.getElementById('tracks-table');
-    if(!d.length){c.innerHTML='Нет треков';return}
-    c.innerHTML='<table><tr><th>НАЗВАНИЕ</th><th>ССЫЛКА</th></tr>'+d.map(function(t){return '<tr><td>'+t.title+'</td><td><a href="'+t.file+'" target="_blank">ОТКРЫТЬ</a></td></tr>'}).join('')+'</table>';
+    if(!d.length){c.innerHTML='<div class="empty">НЕТ ТРЕКОВ</div>';return}
+    c.innerHTML='<table><tr><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th></tr>'+d.map(function(t){return '<tr><td>'+t.title+'</td><td>'+(t.description||'—')+'</td><td><a href="'+t.file+'" target="_blank" style="color:#c00">ОТКРЫТЬ</a></td></tr>'}).join('')+'</table>';
   });
 }
 
 function loadVideos() {
   fetch('/api/videos').then(function(r){return r.json()}).then(function(d){
     var c=document.getElementById('videos-table');
-    if(!d.length){c.innerHTML='Нет видео';return}
-    c.innerHTML='<table><tr><th>НАЗВАНИЕ</th><th>ССЫЛКА</th></tr>'+d.map(function(v){return '<tr><td>'+v.title+'</td><td><a href="'+v.youtube_url+'" target="_blank">ОТКРЫТЬ</a></td></tr>'}).join('')+'</table>';
+    if(!d.length){c.innerHTML='<div class="empty">НЕТ ВИДЕО</div>';return}
+    c.innerHTML='<table><tr><th>НАЗВАНИЕ</th><th>ОПИСАНИЕ</th><th>ССЫЛКА</th></tr>'+d.map(function(v){return '<tr><td>'+v.title+'</td><td>'+(v.description||'—')+'</td><td><a href="'+v.youtube_url+'" target="_blank" style="color:#c00">ОТКРЫТЬ</a></td></tr>'}).join('')+'</table>';
   });
 }
 
 function loadConcerts() {
   fetch('/api/concerts').then(function(r){return r.json()}).then(function(d){
     var c=document.getElementById('concerts-table');
-    if(!d.length){c.innerHTML='Нет мероприятий';return}
-    c.innerHTML='<table><tr><th>ДАТА</th><th>ГОРОД</th></tr>'+d.map(function(co){return '<tr><td>'+co.date+'</td><td>'+co.city+'</td></tr>'}).join('')+'</table>';
+    if(!d.length){c.innerHTML='<div class="empty">НЕТ МЕРОПРИЯТИЙ</div>';return}
+    c.innerHTML='<table><tr><th>ДАТА</th><th>ГОРОД</th><th>ПЛОЩАДКА</th><th>БИЛЕТЫ</th></tr>'+d.map(function(co){return '<tr><td>'+co.date+' '+(co.time||'')+'</td><td>'+co.city+'</td><td>'+(co.venue||'—')+'</td><td>'+(co.ticket_url?'<a href="'+co.ticket_url+'" target="_blank" style="color:#c00">ОТКРЫТЬ</a>':'—')+'</td></tr>'}).join('')+'</table>';
   });
 }
 
 function loadGallery() {
   fetch('/api/gallery').then(function(r){return r.json()}).then(function(d){
     var c=document.getElementById('gallery-table');
-    if(!d.length){c.innerHTML='Нет фото';return}
-    c.innerHTML='<table><tr><th>ФОТО</th><th>ЗАГОЛОВОК</th></tr>'+d.map(function(g){return '<tr><td><img src="/uploads/'+g.file+'" style="width:100px;height:100px;object-fit:cover"></td><td>'+g.title+'</td></tr>'}).join('')+'</table>';
+    if(!d.length){c.innerHTML='<div class="empty">НЕТ ФОТО</div>';return}
+    c.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:15px">'+d.map(function(g){return '<div style="border:1px solid #1a1a1a;background:#000"><img src="/uploads/'+g.file+'" style="width:100%;aspect-ratio:1;object-fit:cover"><div style="padding:8px;font-size:10px;text-align:center">'+g.title+'</div></div>'}).join('')+'</div>';
   });
 }
+
+function loadAbout() {
+  fetch('/api/about').then(function(r){return r.json()}).then(function(d){
+    document.getElementById('about-text').value = d.text || '';
+  });
+}
+
+function loadDesign() {
+  fetch('/api/design').then(function(r){return r.json()}).then(function(d){
+    if(d.accent) document.getElementById('accent-color').value = d.accent;
+    if(d.bg) document.getElementById('bg-color').value = d.bg;
+    if(d.text) document.getElementById('text-color').value = d.text;
+  });
+}
+
+function loadStats() {
+  Promise.all([
+    fetch('/api/tracks').then(function(r){return r.json()}),
+    fetch('/api/videos').then(function(r){return r.json()}),
+    fetch('/api/concerts').then(function(r){return r.json()})
+  ]).then(function(data){
+    document.getElementById('stat-tracks').textContent = data[0].length;
+    document.getElementById('stat-videos').textContent = data[1].length;
+    document.getElementById('stat-concerts').textContent = data[2].length;
+  });
+}
+
+document.getElementById('about-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var text = document.getElementById('about-text').value;
+  fetch('/api/admin/about', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text})}).then(function(){
+    alert('Сохранено!');
+  });
+});
+
+document.getElementById('design-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var data = {
+    accent: document.getElementById('accent-color').value,
+    bg: document.getElementById('bg-color').value,
+    text: document.getElementById('text-color').value
+  };
+  fetch('/api/admin/design', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(){
+    alert('Дизайн обновлён!');
+  });
+});
 </script>
 </body>
 </html>
