@@ -43,6 +43,7 @@ app.use('/uploads', express.static('public/uploads'));
 app.use('/images', express.static('public/images'));
 
 const adminAuth = basicAuth({ users: { 'ruslan505@yandex.ru': 'Rus_Silin_505' }, challenge: true });
+app.get('/admin', adminAuth, (req, res) => res.sendFile(path.join(__dirname, 'admin', 'index.html')));
 app.use('/admin', adminAuth, express.static('admin'));
 
 app.get('/api/tracks', (req, res) => {
