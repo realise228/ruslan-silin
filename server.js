@@ -19,14 +19,6 @@ initSqlJs().then(SQL => {
   db.run('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)');
   db.run('CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP)');
 
-  const count = db.exec('SELECT COUNT(*) FROM tracks');
-  if (!count.length || count[0].values[0][0] === 0) {
-    db.run('INSERT INTO tracks (title, description, file, cover) VALUES (?,?,?,?)', ['Молитва', 'Победа на фестивале', 'https://music.yandex.ru/', '2.jpg']);
-    db.run('INSERT INTO tracks (title, description, file, cover) VALUES (?,?,?,?)', ['Забирай рай', 'В исполнении Ани Лорак', 'https://music.yandex.ru/', '3.jpg']);
-    db.run('INSERT INTO videos (title, description, youtube_url) VALUES (?,?,?)', ['Молитва (Live)', 'Выступление', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ']);
-    db.run('INSERT INTO concerts (city, venue, date, time, ticket_url) VALUES (?,?,?,?,?)', ['Москва', 'Крокус Сити Холл', '15.06.2026', '19:00', '#']);
-  }
-
   app.listen(port, () => console.log('Server running on port ' + port));
 });
 
