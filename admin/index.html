@@ -74,7 +74,7 @@ tr:hover td{background:#111}
         <input name="youtube_url" placeholder="ССЫЛКА НА YOUTUBE" required>
         <button type="submit">ДОБАВИТЬ</button>
       </form>
-      <form action="/api/admin/concert" method="POST" style="margin-top:20px">
+      <form action="/api/admin/concert" method="POST" enctype="multipart/form-data" style="margin-top:20px">
         <h2>ДОБАВИТЬ МЕРОПРИЯТИЕ</h2>
         <input name="city" placeholder="ГОРОД" required>
         <input name="venue" placeholder="ПЛОЩАДКА">
