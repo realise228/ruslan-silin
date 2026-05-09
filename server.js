@@ -39,7 +39,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-const adminAuth = basicAuth({ users: { 'admin': 'music123' }, challenge: true });
+const adminAuth = basicAuth({ users: { 'ruslan505@yandex.ru': 'Rus_Silin_505' }, challenge: true });
 app.use('/admin', adminAuth, express.static('admin'));
 
 app.get('/api/tracks', (req, res) => {
