@@ -1,14 +1,11 @@
 const express = require('express');
-const multer = require('multer');
 const basicAuth = require('express-basic-auth');
 const path = require('path');
-const fs = require('fs');
 const { createClient } = require('@libsql/client');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Turso клиент
 const db = createClient({
   url: 'libsql://ruslan-silin-realise228.aws-eu-west-1.turso.io',
   authToken: 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODAxNTYxOTQsImlkIjoiMDE5ZTc5OTItMDkwMS03NjBlLWE0MTUtZDQ4OGY2YzI1MmI1IiwicmlkIjoiNTI4YTZiOTEtMmRhMy00YWJiLTg3MTEtNzA5NmRmY2FlYzk1In0.4pBWSSWawJNDyYubfGaAeXmP5RL4_CxZYoAbuhydOLmGtsH6ssj6GXeIKFTxcMGDDvLUCt2u4bVw2WNp-t4HAg'
@@ -24,9 +21,6 @@ async function initDB() {
   await db.execute(`CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, phone TEXT, created DATETIME DEFAULT CURRENT_TIMESTAMP)`);
   console.log('Turso DB ready');
 }
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -56,34 +50,33 @@ app.get('/api/about', async (req, res) => {
   try { const r = await db.execute("SELECT * FROM settings WHERE key IN ('about_text','stat1','stat1label','stat2','stat2label','stat3','stat3label')"); const s={}; r.rows.forEach(x=>s[x.key]=x.value); res.json({text:s.about_text||'',stat1:s.stat1||'150+',stat1label:s.stat1label||'ПЕСЕН',stat2:s.stat2||'15',stat2label:s.stat2label||'ЛЕТ',stat3:s.stat3||'3',stat3label:s.stat3label||'СЕЗОН'}); } catch(e) { res.json({}); }
 });
 
-app.post('/api/admin/track', adminAuth, upload.fields([{ name: 'cover' }]), async (req, res) => {
-  const { title, description, url } = req.body;
-  const cover = req.files['cover']?.[0]?.originalname || null;
-  await db.execute('INSERT INTO tracks (title, description, file, cover) VALUES (?,?,?,?)', [title, description, url, cover]);
+app.post('/api/admin/track', adminAuth, async (req, res) => {
+  const { title, description, url, cover } = req.body;
+  await db.execute('INSERT INTO tracks (title, description, file, cover) VALUES (?,?,?,?)', [title||'', description||'', url||'', cover||'']);
   res.redirect('/admin');
 });
 app.post('/api/admin/video', adminAuth, async (req, res) => {
   const { title, description, youtube_url } = req.body;
-  await db.execute('INSERT INTO videos (title, description, youtube_url) VALUES (?,?,?)', [title, description, youtube_url]);
+  await db.execute('INSERT INTO videos (title, description, youtube_url) VALUES (?,?,?)', [title||'', description||'', youtube_url||'']);
   res.redirect('/admin');
 });
 app.post('/api/admin/concert', adminAuth, async (req, res) => {
-  const { city, venue, date, time, ticket_url, description } = req.body;
-  await db.execute('INSERT INTO concerts (city, venue, date, time, ticket_url, description) VALUES (?,?,?,?,?,?)', [city, venue, date, time, ticket_url, description]);
+  const { city, venue, date, time, ticket_url, banner, description } = req.body;
+  await db.execute('INSERT INTO concerts (city, venue, date, time, ticket_url, banner, description) VALUES (?,?,?,?,?,?,?)', [city||'', venue||'', date||'', time||'', ticket_url||'', banner||'', description||'']);
   res.redirect('/admin');
 });
 app.post('/api/admin/gallery', adminAuth, async (req, res) => {
-  const { title, description } = req.body;
-  await db.execute('INSERT INTO gallery (title, description, file) VALUES (?,?,?)', [title||'', description||'', '']);
+  const { title, description, file } = req.body;
+  await db.execute('INSERT INTO gallery (title, description, file) VALUES (?,?,?)', [title||'', description||'', file||'']);
   res.redirect('/admin');
 });
 app.post('/api/admin/about', adminAuth, async (req, res) => {
-  await db.execute("INSERT INTO settings (key, value) VALUES ('about_text', ?) ON CONFLICT(key) DO UPDATE SET value=?", [req.body.text, req.body.text]);
+  await db.execute("INSERT INTO settings (key, value) VALUES ('about_text', ?) ON CONFLICT(key) DO UPDATE SET value=?", [req.body.text||'', req.body.text||'']);
   res.json({ok:true});
 });
 app.post('/api/admin/design', adminAuth, async (req, res) => {
   for (const k of Object.keys(req.body)) {
-    await db.execute("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=?", [k, req.body[k], req.body[k]]);
+    await db.execute("INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value=?", [k, req.body[k]||'', req.body[k]||'']);
   }
   res.json({ok:true});
 });
@@ -93,7 +86,7 @@ app.post('/api/subscribe', async (req, res) => {
 });
 app.post('/api/order', async (req, res) => {
   const {name, email, phone} = req.body;
-  await db.execute('INSERT INTO orders (name, email, phone) VALUES (?,?,?)', [name,email,phone]);
+  await db.execute('INSERT INTO orders (name, email, phone) VALUES (?,?,?)', [name||'', email||'', phone||'']);
   res.json({ok:true});
 });
 
