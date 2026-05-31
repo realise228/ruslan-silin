@@ -15,9 +15,10 @@ async function turso(sql, params = []) {
       'Authorization': 'Bearer ' + TURSO_TOKEN,
       'Content-Type': 'application/json'
     },
+    const safeArgs = params.map(p => ({ type: 'text', value: String(p || '') }));
     body: JSON.stringify({
       requests: [
-        { type: 'execute', stmt: { sql, args: params.map(p => ({ type: 'text', value: String(p || '') })) } },
+        { type: 'execute', stmt: { sql, args: safeArgs } },
         { type: 'close' }
       ]
     })
