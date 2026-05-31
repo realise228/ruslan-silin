@@ -33,7 +33,7 @@ function rowsToObjects(result) {
   if (!result.rows || !result.cols) return [];
   return result.rows.map(row => {
     const obj = {};
-    result.cols.forEach((col, i) => obj[col.name] = row[i]);
+    result.cols.forEach((col, i) => obj[col.name] = (row[i] && typeof row[i] === "object" && row[i].value !== undefined) ? row[i].value : row[i]);
     return obj;
   });
 }
