@@ -1,6 +1,7 @@
 const express = require('express');
 const basicAuth = require('express-basic-auth');
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -50,6 +51,15 @@ async function initDB() {
   console.log('Turso ready');
 }
 
+
+const storage = multer.diskStorage({
+  destination: 'public/uploads/',
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/s+/g, '-'))
+});
+const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } });
+
+if (!fs.existsSync('public/uploads')) fs.mkdirSync('public/uploads', { recursive: true });
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -66,8 +76,9 @@ app.get('/api/gallery', async (req, res) => { try { const r = await turso('SELEC
 app.get('/api/design', async (req, res) => { try { const r = await turso("SELECT * FROM settings WHERE key IN ('accent','bg','text','headingFont','bodyFont')"); const rows = rowsToObjects(r); const s = {}; rows.forEach(x => s[x.key] = x.value); res.json({accent:s.accent||'#cc0000',bg:s.bg||'#000000',text:s.text||'#ffffff',headingFont:s.headingFont||'Oswald',bodyFont:s.bodyFont||'Roboto Mono'}); } catch(e) { res.json({}); } });
 app.get('/api/about', async (req, res) => { try { const r = await turso("SELECT * FROM settings WHERE key IN ('about_text','stat1','stat1label','stat2','stat2label','stat3','stat3label')"); const rows = rowsToObjects(r); const s = {}; rows.forEach(x => s[x.key] = x.value); res.json({text:s.about_text||'',stat1:s.stat1||'150+',stat1label:s.stat1label||'ПЕСЕН',stat2:s.stat2||'15',stat2label:s.stat2label||'ЛЕТ',stat3:s.stat3||'3',stat3label:s.stat3label||'СЕЗОН'}); } catch(e) { res.json({}); } });
 
-app.post('/api/admin/track', adminAuth, async (req, res) => {
-  const { title, description, url, cover } = req.body;
+app.post('/api/admin/track', adminAuth, upload.single('cover'), async (req, res) => {
+  const { title, description, url } = req.body;
+  const cover = req.file ? req.file.filename : '';
   await turso('INSERT INTO tracks (title, description, file, cover) VALUES (?,?,?,?)', [title||'', description||'', url||'', cover||'']);
   res.redirect('/admin');
 });
@@ -76,13 +87,15 @@ app.post('/api/admin/video', adminAuth, async (req, res) => {
   await turso('INSERT INTO videos (title, description, youtube_url) VALUES (?,?,?)', [title||'', description||'', youtube_url||'']);
   res.redirect('/admin');
 });
-app.post('/api/admin/concert', adminAuth, async (req, res) => {
-  const { city, venue, date, time, ticket_url, banner, description } = req.body;
+app.post('/api/admin/concert', adminAuth, upload.single('banner'), async (req, res) => {
+  const { city, venue, date, time, ticket_url, description } = req.body;
+  const banner = req.file ? req.file.filename : '';
   await turso('INSERT INTO concerts (city, venue, date, time, ticket_url, banner, description) VALUES (?,?,?,?,?,?,?)', [city||'', venue||'', date||'', time||'', ticket_url||'', banner||'', description||'']);
   res.redirect('/admin');
 });
-app.post('/api/admin/gallery', adminAuth, async (req, res) => {
-  const { title, description, file } = req.body;
+app.post('/api/admin/gallery', adminAuth, upload.single('image'), async (req, res) => {
+  const { title, description } = req.body;
+  const file = req.file ? req.file.filename : '';
   await turso('INSERT INTO gallery (title, description, file) VALUES (?,?,?)', [title||'', description||'', file||'']);
   res.redirect('/admin');
 });
