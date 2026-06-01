@@ -55,7 +55,7 @@ const adminAuth = basicAuth({ users: { 'ruslan505@yandex.ru': 'Rus_Silin_505' },
 app.use('/admin', adminAuth, express.static('admin'));
 
 function rowsToObjects(result) {
-  if (!result.length) return [];
+  if (!result.length || !result[0].values.length) return [];
   return result[0].values.map(row => {
     const obj = {};
     result[0].columns.forEach((col, i) => obj[col] = row[i]);
@@ -91,9 +91,10 @@ app.post('/api/admin/concert', adminAuth, upload.single('banner'), (req, res) =>
   res.redirect('/admin');
 });
 app.post('/api/admin/gallery', adminAuth, upload.single('image'), (req, res) => {
-  const { title, description } = req.body;
+  const title = req.body.title || '';
+  const description = req.body.description || '';
   const file = req.file ? req.file.filename : '';
-  db.run('INSERT INTO gallery (title, description, file) VALUES (?,?,?)', [title||'', description||'', file]);
+  db.run('INSERT INTO gallery (title, description, file) VALUES (?,?,?)', [title, description, file]);
   saveDB();
   res.redirect('/admin');
 });
